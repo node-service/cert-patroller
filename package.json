@@ -1,0 +1,44 @@
+{
+  "name": "cert-patroller",
+  "version": "0.0.0",
+  "description": "A patroller that regularly checks for expired SSL certificates, base on Node.js and Porkbun APIs.",
+  "author": "chengpeiquan <chengpeiquan@chengpeiquan.com>",
+  "main": "src/index.js",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "node src/index.cjs",
+    "start": "pm2 start src/index.cjs --name cert-patroller",
+    "stop": "pm2 stop src/index.cjs",
+    "restart": "npm run stop && npm run start",
+    "format": "prettier --write src",
+    "mirror:get": "npm config get registry",
+    "mirror:set": "npm config set registry https://registry.npmmirror.com",
+    "mirror:rm": "npm config rm registry",
+    "backup": "git add . && git commit -m \"chore: backup\" && git push",
+    "up": "npx npm-check-updates -u",
+    "prepare": "simple-git-hooks"
+  },
+  "dependencies": {
+    "@bassist/utils": "^0.12.0",
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
+    "node-schedule": "^2.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.0.0",
+    "simple-git-hooks": "^2.8.1"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged --concurrent false"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --write .",
+      "eslint --fix"
+    ]
+  }
+}
