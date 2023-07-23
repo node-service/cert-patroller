@@ -138,7 +138,7 @@ async function run() {
   const localCerts = readCerts()
   saveCerts(certs, localCerts)
 
-  sleep(5000)
+  await sleep(5000)
 
   execSync(process.env.RESTART_COMMAND)
 }
