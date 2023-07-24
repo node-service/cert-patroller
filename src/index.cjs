@@ -120,26 +120,29 @@ function saveCerts(newCerts, oldCerts) {
     mkdirSync(certLocation)
   }
 
-  for (const key in newCerts) {
-    if (Object.hasOwnProperty.call(newCerts, key)) {
-      const newContent = newCerts[key] ?? ''
-      const oldContent = oldCerts[key] ?? ''
-      if (!isSame(newContent, oldContent)) {
-        writeFileSync(certFiles[key], newCerts[key])
-      }
+  // Returns a boolean value to tell if the service needs to be restarted
+  return Object.keys(newCerts).some((key) => {
+    const newContent = newCerts[key] ?? ''
+    const oldContent = oldCerts[key] ?? ''
+    if (!isSame(newContent, oldContent)) {
+      writeFileSync(certFiles[key], newCerts[key])
+      return true
     }
-  }
+    return false
+  })
 }
 
 async function run() {
   const certs = await queryCerts()
   if (!certs) return
 
+  // No need to restart the service if the file has not changed
   const localCerts = readCerts()
-  saveCerts(certs, localCerts)
+  const restartable = saveCerts(certs, localCerts)
+  if (!restartable) return
 
+  // Restart the service for the new certificate to take effect
   await sleep(5000)
-
   execSync(process.env.RESTART_COMMAND)
 }
 
