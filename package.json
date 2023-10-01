@@ -6,11 +6,13 @@
   "main": "src/index.js",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "node src/index.cjs",
     "start": "pm2 start src/index.cjs --name cert-patroller",
     "stop": "pm2 stop src/index.cjs",
     "restart": "npm run stop && npm run start",
+    "lint": "eslint src",
     "format": "prettier --write src",
     "mirror:get": "npm config get registry",
     "mirror:set": "npm config set registry https://registry.npmmirror.com",
@@ -26,14 +28,16 @@
     "node-schedule": "^2.1.1"
   },
   "devDependencies": {
+    "@bassist/commit": "^0.1.0",
+    "@bassist/eslint": "^0.5.0",
     "eslint": "^8.45.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-prettier": "^5.0.0",
+    "lint-staged": "^14.0.1",
     "prettier": "^3.0.0",
     "simple-git-hooks": "^2.8.1"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged --concurrent false"
+    "pre-commit": "pnpm exec lint-staged --concurrent false",
+    "commit-msg": "pnpm exec commit $1"
   },
   "lint-staged": {
     "*.js": [
