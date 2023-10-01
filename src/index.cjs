@@ -94,7 +94,7 @@ function readCerts() {
   const localCerts = {}
 
   const { certFiles } = getFilePaths()
-  Object.keys(certFiles).map((key) => {
+  Object.keys(certFiles).forEach((key) => {
     try {
       const path = certFiles[key]
       const content = readFileSync(path, 'utf-8')
@@ -161,5 +161,6 @@ function task() {
     console.log(e)
   })
 }
+task()
 
 schedule.scheduleJob(taskConfig, task)
