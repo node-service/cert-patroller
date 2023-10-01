@@ -121,15 +121,17 @@ function saveCerts(newCerts, oldCerts) {
   }
 
   // Returns a boolean value to tell if the service needs to be restarted
-  return Object.keys(newCerts).some((key) => {
-    const newContent = newCerts[key] ?? ''
-    const oldContent = oldCerts[key] ?? ''
-    if (!isSame(newContent, oldContent)) {
-      writeFileSync(certFiles[key], newCerts[key])
-      return true
-    }
-    return false
-  })
+  return Object.keys(newCerts)
+    .map((key) => {
+      const newContent = newCerts[key] ?? ''
+      const oldContent = oldCerts[key] ?? ''
+      if (!isSame(newContent, oldContent)) {
+        writeFileSync(certFiles[key], newCerts[key])
+        return true
+      }
+      return false
+    })
+    .some((i) => i)
 }
 
 async function run() {
