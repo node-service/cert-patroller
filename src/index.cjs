@@ -8,8 +8,20 @@ const schedule = require('node-schedule')
 
 loadConfig()
 
+const {
+  PORK_BUN_API_KEY,
+  PORK_BUN_CERT_LOCATION,
+  PORK_BUN_DOMAIN,
+  PORK_BUN_DOMAIN_CERT,
+  PORK_BUN_INTERMEDIATE_CERT,
+  PORK_BUN_PRIVATE_KEY,
+  PORK_BUN_PUBLIC_KEY,
+  RESTART_COMMAND,
+  PORK_BUN_SECRET_API_KEY,
+} = process.env
+
 const axios = axiosStatic.create({
-  baseURL: 'https://porkbun.com/api/json/v3',
+  baseURL: 'https://api.porkbun.com/api/json/v3',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,28 +41,23 @@ function isOk(data) {
 // Every API needs to pass in payload
 function getAuth() {
   return {
-    secretapikey: process.env.SECRET_API_KEY,
-    apikey: process.env.API_KEY,
+    secretapikey: PORK_BUN_SECRET_API_KEY,
+    apikey: PORK_BUN_API_KEY,
   }
 }
 
 function getFilePaths() {
-  const {
-    CERT_LOCATION,
-    DOMAIN_CERT,
-    INTERMEDIATE_CERT,
-    PRIVATE_KEY,
-    PUBLIC_KEY,
-  } = process.env
-
   // The cert Files will be saved in the same folder
-  const certLocation = resolve(process.cwd(), CERT_LOCATION ?? '')
+  const certLocation = resolve(process.cwd(), PORK_BUN_CERT_LOCATION ?? '')
 
   // The absolute path of each file on the server
-  const domainCert = resolve(certLocation, DOMAIN_CERT ?? '')
-  const intermediateCert = resolve(certLocation, INTERMEDIATE_CERT ?? '')
-  const privateKey = resolve(certLocation, PRIVATE_KEY ?? '')
-  const publicKey = resolve(certLocation, PUBLIC_KEY ?? '')
+  const domainCert = resolve(certLocation, PORK_BUN_DOMAIN_CERT ?? '')
+  const intermediateCert = resolve(
+    certLocation,
+    PORK_BUN_INTERMEDIATE_CERT ?? '',
+  )
+  const privateKey = resolve(certLocation, PORK_BUN_PRIVATE_KEY ?? '')
+  const publicKey = resolve(certLocation, PORK_BUN_PUBLIC_KEY ?? '')
 
   return {
     certLocation,
@@ -66,7 +73,7 @@ function getFilePaths() {
 async function queryCerts() {
   const res = await axios({
     method: 'POST',
-    url: `/ssl/retrieve/${process.env.DOMAIN}`,
+    url: `/ssl/retrieve/${PORK_BUN_DOMAIN}`,
     data: { ...getAuth() },
   })
 
@@ -145,7 +152,7 @@ async function run() {
 
   // Restart the service for the new certificate to take effect
   await sleep(5000)
-  execSync(process.env.RESTART_COMMAND)
+  execSync(RESTART_COMMAND)
 }
 
 // https://github.com/node-schedule/node-schedule
